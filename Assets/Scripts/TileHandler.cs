@@ -27,6 +27,7 @@ public class TileHandler : MonoBehaviour
         if (node == null)
             return;
 
+        focusRenderer.enabled = false;
         if (node.piece != null)
         {
             pieceRenderer.enabled = true;
@@ -39,8 +40,8 @@ public class TileHandler : MonoBehaviour
         }
     }
 
-    void Update()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-
+        //Debug.Log("WOW WOW");
     }
 }

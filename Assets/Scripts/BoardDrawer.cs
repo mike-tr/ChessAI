@@ -14,8 +14,12 @@ public class BoardDrawer : MonoBehaviour
     public Vector2 tileOffset;
     private Transform holder;
 
+    public Collider2D cursor;
+
+    private Camera cam;
     private void Start()
     {
+        cam = Camera.main;
         var sp = GetComponent<SpriteRenderer>();
         Debug.Log(sp.bounds.size);
         tileOffset.x = sp.bounds.size.x / 8;
@@ -65,6 +69,16 @@ public class BoardDrawer : MonoBehaviour
             {
                 tiles[x, y].SetNode(newBoard.board[x, y]);
             }
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            var pos = cam.ScreenToWorldPoint(Input.mousePosition);
+            cursor.transform.position = pos;
+
         }
     }
 }

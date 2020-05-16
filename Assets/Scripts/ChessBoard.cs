@@ -18,7 +18,7 @@ public class ChessBoard
         {
             for (int x = 0; x < 8; x++)
             {
-                board[x, y] = new ChessNode(x, y);
+                board[x, y] = new ChessNode(this, x, y);
             }
         }
         for (int i = 0; i < 8; i++)
@@ -39,7 +39,7 @@ public class ChessBoard
         {
             for (int x = 0; x < 8; x++)
             {
-                board[x, y] = new ChessNode(x, y);
+                board[x, y] = new ChessNode(this, x, y);
             }
         }
 
@@ -53,7 +53,7 @@ public class ChessBoard
         }
     }
 
-    public ChessPiece GetAt(int x, int y)
+    public ChessPiece GetPieceAt(int x, int y)
     {
         return board[x, y].piece;
     }
