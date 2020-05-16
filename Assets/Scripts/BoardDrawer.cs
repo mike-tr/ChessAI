@@ -13,9 +13,7 @@ public class BoardDrawer : MonoBehaviour
     public Vector2 boardOffset;
     public Vector2 tileOffset;
     private Transform holder;
-
-    public Collider2D cursor;
-
+    public BoardCursor cursor;
     private Camera cam;
     private void Start()
     {
@@ -77,8 +75,7 @@ public class BoardDrawer : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             var pos = cam.ScreenToWorldPoint(Input.mousePosition);
-            cursor.transform.position = pos;
-
+            cursor.SetPos(pos);
         }
     }
 }

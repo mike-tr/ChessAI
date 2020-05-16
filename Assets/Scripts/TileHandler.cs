@@ -40,8 +40,31 @@ public class TileHandler : MonoBehaviour
         }
     }
 
+    public void SetFocus(bool state)
+    {
+        SetFocus(state, Color.red);
+    }
+    public void SetFocus(bool state, Color color)
+    {
+        Debug.Log(state);
+        if (state)
+        {
+            focusRenderer.enabled = true;
+            color.a = 0.25f;
+            focusRenderer.color = color;
+        }
+        else
+        {
+            focusRenderer.enabled = false;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log("WOW WOW");
+        var logic = other.GetComponent<BoardCursor>();
+        if (logic)
+        {
+            logic.SetTile(this);
+        }
     }
 }
