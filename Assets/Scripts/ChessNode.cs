@@ -2,22 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChessNode
-{
+public class ChessNode {
     public ChessPiece piece;
     public ChessBoard board;
     public int x, y;
 
-    public ChessNode(ChessBoard board, int x, int y)
-    {
+    public ChessNode (ChessBoard board, int x, int y) {
         this.board = board;
         this.x = x;
         this.y = y;
         piece = null;
     }
 
-    public ChessNode GetNodeFrom(int offset_x, int offset_y)
-    {
+    public ChessNode GetNodeFrom (int offset_x, int offset_y) {
         var nx = x + offset_x;
         if (nx > 7 || nx < 0)
             return null;
@@ -27,20 +24,17 @@ public class ChessNode
         return board.board[nx, ny];
     }
 
-    public ChessPiece InitializePiece(PieceType type, TeamColor player, ChessBoard board)
-    {
-        piece = new ChessPiece(this, type, player);
-        board.pieces[player].Add(piece);
+    public ChessPiece InitializePiece (PieceType type, TeamColor player, ChessBoard board) {
+        piece = new ChessPiece (this, type, player);
+        board.pieces[player].Add (piece);
         return piece;
     }
 
-    public bool TheSameAs(ChessNode node)
-    {
+    public bool TheSameAs (ChessNode node) {
         return node.x == x && node.y == y;
     }
 
-    public BoardCord GetCord()
-    {
-        return new BoardCord(x, y);
+    public BoardCord GetCord () {
+        return new BoardCord (x, y);
     }
 }
