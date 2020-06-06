@@ -54,7 +54,7 @@ public class TileHandler : MonoBehaviour {
         drawer.RefreshBoard ();
         ColorTile (Color.cyan, true);
         if (player == drawer.CurrentTurn () && node.piece != null && node.piece.color == player) {
-            List<PieceMove> moves = node.piece.GetMoves ();
+            List<PieceMove> moves = node.piece.GetValidMoves ();
             foreach (var move in moves) {
                 //cord.GetTileHandler (drawer).SetFocus (true);
                 move.end.GetTileHandler (drawer).AddMove (move);

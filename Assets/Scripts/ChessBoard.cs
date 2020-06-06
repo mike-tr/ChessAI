@@ -6,8 +6,8 @@ public class ChessBoard {
     public const TeamColor white = TeamColor.white;
     public const TeamColor black = TeamColor.black;
     public Dictionary<TeamColor, List<ChessPiece>> pieces = new Dictionary<TeamColor, List<ChessPiece>> ();
+    public Dictionary<TeamColor, ChessPiece> kings = new Dictionary<TeamColor, ChessPiece> ();
     public ChessNode[, ] board = new ChessNode[8, 8];
-
     public TeamColor currentPlayer = TeamColor.white;
 
     public ChessBoard () {
@@ -50,11 +50,17 @@ public class ChessBoard {
         }
     }
 
-    public List<PieceMove> GetAllPlayerMoves (TeamColor color) {
+    public List<PieceMove> GetAllPlayerMoves (TeamColor color, bool validated) {
         List<PieceMove> moves = new List<PieceMove> ();
         foreach (var piece in pieces[color]) {
-            foreach (var move in piece.GetMoves ()) {
-                moves.Add (move);
+            if (!validated) {
+                foreach (var move in piece.GetMoves ()) {
+                    moves.Add (move);
+                }
+            } else {
+                foreach (var move in piece.GetValidMoves ()) {
+                    moves.Add (move);
+                }
             }
         }
         return moves;

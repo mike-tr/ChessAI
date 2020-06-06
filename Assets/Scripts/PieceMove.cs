@@ -12,6 +12,21 @@ public class PieceMove {
         this.end = end.GetCord ();
     }
 
+    public static bool CheckOverlap (List<PieceMove> moves, BoardCord cord) {
+        foreach (var move in moves) {
+            if (move.CheckOverlap (cord))
+                return true;
+        }
+        return false;
+    }
+
+    public bool CheckOverlap (List<PieceMove> moves) {
+        foreach (var move in moves) {
+            if (move.CheckOverlap (end))
+                return true;
+        }
+        return false;
+    }
     public bool CheckOverlap (ChessNode node) {
         return end.Overlaps (node);
     }

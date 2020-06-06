@@ -27,6 +27,9 @@ public class ChessNode {
     public ChessPiece InitializePiece (PieceType type, TeamColor player, ChessBoard board, bool moved = false) {
         piece = new ChessPiece (this, type, player, moved);
         board.pieces[player].Add (piece);
+        if (type == PieceType.King) {
+            board.kings.Add (player, piece);
+        }
         return piece;
     }
 

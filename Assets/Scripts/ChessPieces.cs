@@ -38,6 +38,30 @@ public class ChessPiece {
         this.moved = piece.moved;
     }
 
+    public List<PieceMove> GetValidMoves () {
+        List<PieceMove> nonValidatedMoves = GetMoves ();
+        var validated = new List<PieceMove> ();
+        if (type != PieceType.King) {
+            BoardCord kingCord = node.board.kings[color].node.GetCord ();
+            Debug.Log (kingCord.x + " ," + kingCord.y);
+            //List<PieceMove> moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
+            foreach (var move in nonValidatedMoves) {
+                List<PieceMove> moves = move.ApplyMove ().GetAllPlayerMoves (OppositeTeam (), false);
+                if (!PieceMove.CheckOverlap (moves, kingCord)) {
+                    validated.Add (move);
+                }
+            }
+        } else {
+            List<PieceMove> moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
+            foreach (var move in nonValidatedMoves) {
+                if (!move.CheckOverlap (moves)) {
+                    validated.Add (move);
+                }
+            }
+        }
+        return validated;
+    }
+
     public List<PieceMove> GetMoves () {
         var list = new List<PieceMove> ();
         switch (type) {
@@ -105,6 +129,10 @@ public class ChessPiece {
             return null;
         if (current != node && !IsAlly (current.piece)) {
             // check if cant be killed, and return if cant
+            List<PieceMove> moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
+            if (PieceMove.CheckOverlap (moves, node.GetCord ())) {
+                return null;
+            }
         }
         return move;
     }
@@ -125,6 +153,10 @@ public class ChessPiece {
         if (piece == null)
             return false;
         return piece.color == color;
+    }
+
+    public TeamColor OppositeTeam () {
+        return TeamColor.white == color ? TeamColor.black : TeamColor.white;
     }
 
     public List<PieceMove> PawnMove () {
