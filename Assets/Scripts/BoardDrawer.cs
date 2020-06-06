@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BoardDrawer : MonoBehaviour {
+
+    public delegate void OnBoardChange ();
+    public OnBoardChange OnChangeCallBack;
     public string fileName;
     public Dictionary<TeamColor, Dictionary<PieceType, Sprite>> sprites = new Dictionary<TeamColor, Dictionary<PieceType, Sprite>> ();
     public TileHandler[, ] tiles = new TileHandler[8, 8];
@@ -14,6 +17,7 @@ public class BoardDrawer : MonoBehaviour {
     private Transform holder;
     public BoardCursor cursor;
     private Camera cam;
+
     private void Start () {
         cam = Camera.main;
         var sp = GetComponent<SpriteRenderer> ();
@@ -50,6 +54,10 @@ public class BoardDrawer : MonoBehaviour {
         SwitchBoard (board);
     }
 
+    public TeamColor CurrentTurn () {
+        return board.currentPlayer;
+    }
+
     public void SwitchBoard (ChessBoard newBoard) {
         board = newBoard;
         for (int x = 0; x < 8; x++) {
@@ -57,18 +65,24 @@ public class BoardDrawer : MonoBehaviour {
                 tiles[x, y].SetNode (newBoard.board[x, y]);
             }
         }
+        if (OnChangeCallBack != null) {
+            OnChangeCallBack.Invoke ();
+        }
     }
 
     private void Update () {
         if (Input.GetKeyDown (KeyCode.Mouse0)) {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    tiles[x, y].SetFocus (false);
-                }
-            }
             var pos = cam.ScreenToWorldPoint (Input.mousePosition);
             cursor.SetPos (pos);
 
+        }
+    }
+
+    public void RefreshBoard () {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                tiles[x, y].ResetTile ();
+            }
         }
     }
 }

@@ -22,14 +22,24 @@ public class ChessPiece {
     public PieceType type;
     public TeamColor color;
 
-    public ChessPiece (ChessNode node, PieceType type, TeamColor player) {
+    public bool moved;
+
+    public ChessPiece (ChessNode node, PieceType type, TeamColor player, bool moved = false) {
         this.node = node;
         this.type = type;
         this.color = player;
+        this.moved = moved;
     }
 
-    public List<BoardCord> GetMoves () {
-        var list = new List<BoardCord> ();
+    public ChessPiece (ChessPiece piece) {
+        this.node = piece.node;
+        this.type = piece.type;
+        this.color = piece.color;
+        this.moved = piece.moved;
+    }
+
+    public List<PieceMove> GetMoves () {
+        var list = new List<PieceMove> ();
         switch (type) {
             case PieceType.Pawn:
                 list = PawnMove ();
@@ -45,20 +55,70 @@ public class ChessPiece {
                 AddIfValid (list, -2, 1);
                 AddIfValid (list, -2, -1);
                 break;
+            case PieceType.Bishop:
+                AddLine (list, 1, 1);
+                AddLine (list, -1, 1);
+                AddLine (list, 1, -1);
+                AddLine (list, -1, -1);
+                break;
+            case PieceType.Rook:
+                AddLine (list, 1, 0);
+                AddLine (list, 0, 1);
+                AddLine (list, -1, 0);
+                AddLine (list, 0, -1);
+                break;
+            case PieceType.Queen:
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        if (x != 0 || y != 0) {
+                            AddLine (list, x, y);
+                        }
+                    }
+                }
+                break;
+            case PieceType.King:
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        if (x != 0 || y != 0) {
+                            AddIfValid (list, x, y);
+                        }
+                    }
+                }
+                break;
         }
         return list;
     }
 
-    public ChessNode AddIfValid (List<BoardCord> list, int offset_x, int offset_y) {
+    public void AddLine (List<PieceMove> list, int dirX, int dirY) {
+        int x = dirX;
+        int y = dirY;
+        while (AddIfValid (list, x, y) > 0) {
+            x += dirX;
+            y += dirY;
+        }
+    }
+
+    public PieceMove KingMove (int offset_x, int offset_y) {
+        PieceMove move = null;
         ChessNode current = node.GetNodeFrom (offset_x, offset_y);
         if (current == null)
             return null;
+        if (current != node && !IsAlly (current.piece)) {
+            // check if cant be killed, and return if cant
+        }
+        return move;
+    }
+
+    public int AddIfValid (List<PieceMove> list, int offset_x, int offset_y) {
+        ChessNode current = node.GetNodeFrom (offset_x, offset_y);
+        if (current == null)
+            return 0;
         Debug.Log (current.x + " , " + current.y + " ,,," + offset_x + " , " + offset_y);
         if (current != node && !IsAlly (current.piece)) {
-            list.Add (current.GetCord ());
-            return current;
+            list.Add (new PieceMove (node, current));
+            return current.piece == null ? 1 : -1;
         }
-        return null;
+        return 0;
     }
 
     public bool IsAlly (ChessPiece piece) {
@@ -67,28 +127,30 @@ public class ChessPiece {
         return piece.color == color;
     }
 
-    public List<BoardCord> PawnMove () {
-        var list = new List<BoardCord> ();
+    public List<PieceMove> PawnMove () {
+        Debug.Log ("----------------");
+        Debug.Log (node.x + " ," + node.y);
+        var list = new List<PieceMove> ();
         var dir = color == TeamColor.white ? 1 : -1;
         var current = node.GetNodeFrom (0, dir);
         if (current.piece == null) {
-            list.Add (current.GetCord ());
+            list.Add (new PieceMove (node, current));
             var start = dir > 0 ? 1 : 6;
             if (node.y == start) {
                 current = node.GetNodeFrom (0, dir * 2);
                 if (current.piece == null) {
-                    list.Add (current.GetCord ());
+                    list.Add (new PieceMove (node, current));
                 }
             }
+        }
 
-            current = node.GetNodeFrom (1, dir);
-            if (current != null && current.piece != null) {
-                list.Add (current.GetCord ());
-            }
-            current = node.GetNodeFrom (-1, dir);
-            if (current != null && current.piece != null) {
-                list.Add (current.GetCord ());
-            }
+        current = node.GetNodeFrom (1, dir);
+        if (current != null && current.piece != null && current.piece.color != color) {
+            list.Add (new PieceMove (node, current));
+        }
+        current = node.GetNodeFrom (-1, dir);
+        if (current != null && current.piece != null && current.piece.color != color) {
+            list.Add (new PieceMove (node, current));
         }
         return list;
     }

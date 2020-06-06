@@ -24,13 +24,23 @@ public class ChessNode {
         return board.board[nx, ny];
     }
 
-    public ChessPiece InitializePiece (PieceType type, TeamColor player, ChessBoard board) {
-        piece = new ChessPiece (this, type, player);
+    public ChessPiece InitializePiece (PieceType type, TeamColor player, ChessBoard board, bool moved = false) {
+        piece = new ChessPiece (this, type, player, moved);
         board.pieces[player].Add (piece);
         return piece;
     }
 
-    public bool TheSameAs (ChessNode node) {
+    public bool ReplaceWithAnother (ChessNode node) {
+        if (piece != null)
+            board.pieces[piece.color].Remove (piece);
+        piece = node.piece;
+        piece.node = this;
+
+        node.piece = null;
+        return true;
+    }
+
+    public bool Overlaps (ChessNode node) {
         return node.x == x && node.y == y;
     }
 

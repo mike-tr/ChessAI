@@ -9,6 +9,7 @@ public class TileHandler : MonoBehaviour {
     public SpriteRenderer pieceRenderer;
     public SpriteRenderer focusRenderer;
     public Vector2 offset;
+    private PieceMove move;
     public void Initialize (BoardDrawer drawer, Transform holder, int x, int y, Vector2 tileOffset) {
         this.drawer = drawer;
         transform.parent = holder;
@@ -17,6 +18,7 @@ public class TileHandler : MonoBehaviour {
     public void SetNode (ChessNode node) {
         this.node = node;
         UpdateImage ();
+        move = null;
     }
 
     public void UpdateImage () {
@@ -33,21 +35,34 @@ public class TileHandler : MonoBehaviour {
         }
     }
 
-    public void SetFocus (bool state) {
-        SetFocus (Color.red, state);
+    public void ResetTile () {
+        ColorTile (Color.red, false);
+        move = null;
     }
 
-    public void GetMoves () {
-        SetFocus (Color.cyan, true);
-        if (node.piece != null) {
-            List<BoardCord> cords = node.piece.GetMoves ();
-            foreach (var cord in cords) {
-                cord.GetTileHandler (drawer).SetFocus (true);
+    public void AddMove (PieceMove move) {
+        this.move = move;
+        ColorTile (Color.red, true);
+    }
+
+    public void GetMoves (TeamColor player) {
+        if (move != null) {
+            drawer.SwitchBoard (move.ApplyMove ());
+            //drawer.RefreshBoard ();
+            return;
+        }
+        drawer.RefreshBoard ();
+        ColorTile (Color.cyan, true);
+        if (player == drawer.CurrentTurn () && node.piece != null && node.piece.color == player) {
+            List<PieceMove> moves = node.piece.GetMoves ();
+            foreach (var move in moves) {
+                //cord.GetTileHandler (drawer).SetFocus (true);
+                move.end.GetTileHandler (drawer).AddMove (move);
             }
         }
     }
 
-    public void SetFocus (Color color, bool state) {
+    public void ColorTile (Color color, bool state) {
         //Debug.Log (state);
         if (state) {
             focusRenderer.enabled = true;
