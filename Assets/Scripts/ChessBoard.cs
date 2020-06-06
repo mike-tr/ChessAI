@@ -7,7 +7,7 @@ public class ChessBoard {
     public const TeamColor black = TeamColor.black;
     public Dictionary<TeamColor, List<ChessPiece>> pieces = new Dictionary<TeamColor, List<ChessPiece>> ();
     public Dictionary<TeamColor, ChessPiece> kings = new Dictionary<TeamColor, ChessPiece> ();
-    public ChessNode[, ] board = new ChessNode[8, 8];
+    public ChessNode[, ] nodes = new ChessNode[8, 8];
     public TeamColor currentPlayer = TeamColor.white;
 
     public ChessBoard () {
@@ -16,12 +16,12 @@ public class ChessBoard {
         pieces.Add (black, new List<ChessPiece> ());
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
-                board[x, y] = new ChessNode (this, x, y);
+                nodes[x, y] = new ChessNode (this, x, y);
             }
         }
         for (int i = 0; i < 8; i++) {
-            board[i, 6].InitializePiece (PieceType.Pawn, black, this);
-            board[i, 1].InitializePiece (PieceType.Pawn, white, this);
+            nodes[i, 6].InitializePiece (PieceType.Pawn, black, this);
+            nodes[i, 1].InitializePiece (PieceType.Pawn, white, this);
         }
         initSide (7, black);
         initSide (0, white);
@@ -38,15 +38,15 @@ public class ChessBoard {
         this.pieces.Add (black, new List<ChessPiece> ());
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
-                board[x, y] = new ChessNode (this, x, y);
+                nodes[x, y] = new ChessNode (this, x, y);
             }
         }
 
         foreach (var piece in copy[black]) {
-            board[piece.node.x, piece.node.y].InitializePiece (piece.type, piece.color, this, piece.moved);
+            nodes[piece.node.x, piece.node.y].InitializePiece (piece.type, piece.color, this, piece.moved);
         }
         foreach (var piece in copy[white]) {
-            board[piece.node.x, piece.node.y].InitializePiece (piece.type, piece.color, this, piece.moved);
+            nodes[piece.node.x, piece.node.y].InitializePiece (piece.type, piece.color, this, piece.moved);
         }
     }
 
@@ -74,17 +74,17 @@ public class ChessBoard {
     }
 
     public ChessPiece GetPieceAt (int x, int y) {
-        return board[x, y].piece;
+        return nodes[x, y].piece;
     }
 
     public void initSide (int y, TeamColor player) {
-        board[0, y].InitializePiece (PieceType.Rook, player, this);
-        board[7, y].InitializePiece (PieceType.Rook, player, this);
-        board[1, y].InitializePiece (PieceType.Knight, player, this);
-        board[6, y].InitializePiece (PieceType.Knight, player, this);
-        board[2, y].InitializePiece (PieceType.Bishop, player, this);
-        board[5, y].InitializePiece (PieceType.Bishop, player, this);
-        board[4, y].InitializePiece (PieceType.Queen, player, this);
-        board[3, y].InitializePiece (PieceType.King, player, this);
+        nodes[0, y].InitializePiece (PieceType.Rook, player, this);
+        nodes[7, y].InitializePiece (PieceType.Rook, player, this);
+        nodes[1, y].InitializePiece (PieceType.Knight, player, this);
+        nodes[6, y].InitializePiece (PieceType.Knight, player, this);
+        nodes[2, y].InitializePiece (PieceType.Bishop, player, this);
+        nodes[5, y].InitializePiece (PieceType.Bishop, player, this);
+        nodes[4, y].InitializePiece (PieceType.Queen, player, this);
+        nodes[3, y].InitializePiece (PieceType.King, player, this);
     }
 }

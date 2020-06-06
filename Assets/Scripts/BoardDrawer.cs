@@ -62,7 +62,7 @@ public class BoardDrawer : MonoBehaviour {
         board = newBoard;
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                tiles[x, y].SetNode (newBoard.board[x, y]);
+                tiles[x, y].SetNode (newBoard.nodes[x, y]);
             }
         }
         if (OnChangeCallBack != null) {

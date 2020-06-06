@@ -58,6 +58,34 @@ public class ChessPiece {
                     validated.Add (move);
                 }
             }
+
+            if (!moved && !PieceMove.CheckOverlap (moves, node)) {
+                var board = node.board;
+                var rook = board.nodes[node.x - 3, node.y];
+                if (rook.piece != null && !rook.piece.moved && rook.piece.type == PieceType.Rook) {
+                    var rookEndCord = board.nodes[node.x - 1, node.y];
+                    var kingEndCord = board.nodes[node.x - 2, node.y];
+                    if (rookEndCord.piece == null && kingEndCord.piece == null) {
+                        if (!PieceMove.CheckOverlap (moves, rookEndCord) &&
+                            !PieceMove.CheckOverlap (moves, kingEndCord)) {
+                            validated.Add (new ComplexMove (node, kingEndCord, rook, rookEndCord));
+                        }
+                    }
+                }
+
+                rook = board.nodes[node.x + 4, node.y];
+                if (rook.piece != null && !rook.piece.moved && rook.piece.type == PieceType.Rook) {
+                    var rookEndCord = board.nodes[node.x + 1, node.y];
+                    var kingEndCord = board.nodes[node.x + 2, node.y];
+                    var lastPos = board.nodes[node.x + 3, node.y];
+                    if (rookEndCord.piece == null && kingEndCord.piece == null && lastPos.piece == null) {
+                        if (!PieceMove.CheckOverlap (moves, rookEndCord) &&
+                            !PieceMove.CheckOverlap (moves, kingEndCord) && !PieceMove.CheckOverlap (moves, lastPos)) {
+                            validated.Add (new ComplexMove (node, kingEndCord, rook, rookEndCord));
+                        }
+                    }
+                }
+            }
         }
         return validated;
     }

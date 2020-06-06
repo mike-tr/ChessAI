@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PieceMove {
-    public BoardCord start { get; private set; }
-    public BoardCord end { get; private set; }
-    private ChessBoard board;
+    public BoardCord start { get; protected set; }
+    public BoardCord end { get; protected set; }
+    protected ChessBoard board;
     public PieceMove (ChessNode start, ChessNode end) {
         this.board = start.board;
         this.start = start.GetCord ();
@@ -15,6 +15,14 @@ public class PieceMove {
     public static bool CheckOverlap (List<PieceMove> moves, BoardCord cord) {
         foreach (var move in moves) {
             if (move.CheckOverlap (cord))
+                return true;
+        }
+        return false;
+    }
+
+    public static bool CheckOverlap (List<PieceMove> moves, ChessNode node) {
+        foreach (var move in moves) {
+            if (move.CheckOverlap (node))
                 return true;
         }
         return false;
@@ -35,7 +43,7 @@ public class PieceMove {
         return end.Overlaps (cord);
     }
 
-    public ChessBoard ApplyMove () {
+    public virtual ChessBoard ApplyMove () {
         var newboard = board.Copy ();
         var enode = end.GetNode (newboard);
         newboard.ChangeTurn ();

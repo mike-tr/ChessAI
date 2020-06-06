@@ -21,7 +21,7 @@ public class ChessNode {
         var ny = y + offset_y;
         if (ny > 7 || ny < 0)
             return null;
-        return board.board[nx, ny];
+        return board.nodes[nx, ny];
     }
 
     public ChessPiece InitializePiece (PieceType type, TeamColor player, ChessBoard board, bool moved = false) {

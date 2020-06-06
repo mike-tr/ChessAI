@@ -18,7 +18,7 @@ public class BoardCord {
     }
 
     public ChessNode GetNode (ChessBoard board) {
-        return board.board[x, y];
+        return board.nodes[x, y];
     }
 
     public TileHandler GetTileHandler (BoardDrawer drawer) {
