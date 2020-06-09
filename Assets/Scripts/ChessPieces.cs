@@ -39,6 +39,8 @@ public class ChessPiece {
     }
 
     public List<PieceMove> GetValidMoves () {
+        // this method returns, all the valid moves for a given piece, 
+        // a.k.a every move that wont result in you'r king being eaten.
         List<PieceMove> nonValidatedMoves = GetMoves ();
         var validated = new List<PieceMove> ();
         if (type != PieceType.King) {
@@ -52,13 +54,14 @@ public class ChessPiece {
                 }
             }
         } else {
-            List<PieceMove> moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
+            List<PieceMove> moves = null;
             foreach (var move in nonValidatedMoves) {
+                moves = move.ApplyMove ().GetAllPlayerMoves (OppositeTeam (), false);
                 if (!move.CheckOverlap (moves)) {
                     validated.Add (move);
                 }
             }
-
+            moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
             if (!moved && !PieceMove.CheckOverlap (moves, node)) {
                 var board = node.board;
                 var rook = board.nodes[node.x - 3, node.y];
@@ -91,21 +94,22 @@ public class ChessPiece {
     }
 
     public List<PieceMove> GetMoves () {
+        // return a list of all available moves, those are any more that are not resulting in u killing you'r own unit.
         var list = new List<PieceMove> ();
         switch (type) {
             case PieceType.Pawn:
                 list = PawnMove ();
                 break;
             case PieceType.Knight:
-                AddIfValid (list, 1, 2);
-                AddIfValid (list, -1, 2);
-                AddIfValid (list, 1, -2);
-                AddIfValid (list, -1, -2);
+                AddMove (list, 1, 2);
+                AddMove (list, -1, 2);
+                AddMove (list, 1, -2);
+                AddMove (list, -1, -2);
 
-                AddIfValid (list, 2, 1);
-                AddIfValid (list, 2, -1);
-                AddIfValid (list, -2, 1);
-                AddIfValid (list, -2, -1);
+                AddMove (list, 2, 1);
+                AddMove (list, 2, -1);
+                AddMove (list, -2, 1);
+                AddMove (list, -2, -1);
                 break;
             case PieceType.Bishop:
                 AddLine (list, 1, 1);
@@ -132,7 +136,7 @@ public class ChessPiece {
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
                         if (x != 0 || y != 0) {
-                            AddIfValid (list, x, y);
+                            AddMove (list, x, y);
                         }
                     }
                 }
@@ -142,30 +146,18 @@ public class ChessPiece {
     }
 
     public void AddLine (List<PieceMove> list, int dirX, int dirY) {
+        // Add moves on a line untill, we hit obstacle.
         int x = dirX;
         int y = dirY;
-        while (AddIfValid (list, x, y) > 0) {
+        while (AddMove (list, x, y) > 0) {
             x += dirX;
             y += dirY;
         }
     }
 
-    public PieceMove KingMove (int offset_x, int offset_y) {
-        PieceMove move = null;
-        ChessNode current = node.GetNodeFrom (offset_x, offset_y);
-        if (current == null)
-            return null;
-        if (current != node && !IsAlly (current.piece)) {
-            // check if cant be killed, and return if cant
-            List<PieceMove> moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
-            if (PieceMove.CheckOverlap (moves, node.GetCord ())) {
-                return null;
-            }
-        }
-        return move;
-    }
-
-    public int AddIfValid (List<PieceMove> list, int offset_x, int offset_y) {
+    public int AddMove (List<PieceMove> list, int offset_x, int offset_y) {
+        // Add the given move into the list,
+        // if the node exist, and it doesnt contain an ally on it. ( we dont wanna eat an ally )
         ChessNode current = node.GetNodeFrom (offset_x, offset_y);
         if (current == null)
             return 0;
@@ -184,12 +176,12 @@ public class ChessPiece {
     }
 
     public TeamColor OppositeTeam () {
+        // return the color of the enemy
         return TeamColor.white == color ? TeamColor.black : TeamColor.white;
     }
 
     public List<PieceMove> PawnMove () {
-        Debug.Log ("----------------");
-        Debug.Log (node.x + " ," + node.y);
+        // pawns have wierd logic, so they deserve a method of their own.
         var list = new List<PieceMove> ();
         var dir = color == TeamColor.white ? 1 : -1;
         var current = node.GetNodeFrom (0, dir);

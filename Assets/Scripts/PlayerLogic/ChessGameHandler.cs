@@ -13,15 +13,31 @@ public class ChessGameHandler : MonoBehaviour {
         board = GetComponent<BoardDrawer> ();
         board.OnChangeCallBack += NextTurn;
         if (whitePlayer == null) {
-            whitePlayer = new HumanCBrain ();
+            whitePlayer = new HumanCBrain (board, this, TeamColor.white);
         }
         if (blackPlayer == null) {
-            blackPlayer = new HumanCBrain ();
+            //blackPlayer = new HumanCBrain (board, this, TeamColor.black);
+            blackPlayer = new AIBrain (board, this, TeamColor.black);
         }
-        whitePlayer.Init (board, this, TeamColor.white);
-        blackPlayer.Init (board, this, TeamColor.black);
         player.Add (TeamColor.white, whitePlayer);
         player.Add (TeamColor.black, blackPlayer);
+    }
+
+    private void Update () {
+        if (Input.GetKeyDown (KeyCode.I)) {
+            Debug.Log ("show every possible move!");
+            board.RefreshBoard ();
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    var c = new Color (Random.value, Random.value, Random.value, 1);
+                    c.a = 1f;
+                    var tile = board.tiles[x, y];
+                    var xy = x * y / 64f;
+
+                    tile.DrawAllMoves (board.CurrentTurn ());
+                }
+            }
+        }
     }
 
     public void NextTurn () {

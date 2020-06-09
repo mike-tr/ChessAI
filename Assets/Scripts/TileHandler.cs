@@ -40,12 +40,45 @@ public class TileHandler : MonoBehaviour {
         move = null;
     }
 
-    public void AddMove (PieceMove move) {
+    public void EnableMove (PieceMove move) {
         this.move = move;
         ColorTile (Color.red, true);
     }
 
-    public void GetMoves (TeamColor player) {
+    public void DrawAllMoves (TeamColor player) {
+        if (node.piece != null && node.piece.color == player) {
+            var color = Color.black;
+            switch (node.piece.type) {
+                case PieceType.Knight:
+                    color = Color.blue;
+                    break;
+                case PieceType.Bishop:
+                    color = Color.yellow;
+                    break;
+                case PieceType.King:
+                    color = Color.cyan;
+                    break;
+                case PieceType.Queen:
+                    color = Color.magenta;
+                    break;
+                case PieceType.Pawn:
+                    color = new Color (1f, 0.5f, 0.3f);
+                    break;
+                case PieceType.Rook:
+                    color = Color.green;
+                    break;
+            }
+            //ColorTile (color * 2f, true);
+            List<PieceMove> moves = node.piece.GetValidMoves ();
+            foreach (var move in moves) {
+                //cord.GetTileHandler (drawer).SetFocus (true);
+
+                move.end.GetTileHandler (drawer).AddTileColor (color);
+            }
+        }
+    }
+
+    public void EnableMoves (TeamColor player) {
         if (move != null) {
             drawer.SwitchBoard (move.ApplyMove ());
             //drawer.RefreshBoard ();
@@ -55,11 +88,18 @@ public class TileHandler : MonoBehaviour {
         ColorTile (Color.cyan, true);
         if (player == drawer.CurrentTurn () && node.piece != null && node.piece.color == player) {
             List<PieceMove> moves = node.piece.GetValidMoves ();
+            //List<PieceMove> moves = node.piece.GetMoves ();
             foreach (var move in moves) {
                 //cord.GetTileHandler (drawer).SetFocus (true);
-                move.end.GetTileHandler (drawer).AddMove (move);
+                move.end.GetTileHandler (drawer).EnableMove (move);
             }
         }
+    }
+
+    public void AddTileColor (Color color) {
+        focusRenderer.enabled = true;
+        color.a = 0.3f;
+        focusRenderer.color += color;
     }
 
     public void ColorTile (Color color, bool state) {
@@ -69,6 +109,7 @@ public class TileHandler : MonoBehaviour {
             color.a = 0.25f;
             focusRenderer.color = color;
         } else {
+            focusRenderer.color = Color.black * 0;
             focusRenderer.enabled = false;
         }
     }

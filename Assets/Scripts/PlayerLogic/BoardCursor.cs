@@ -25,7 +25,7 @@ public class BoardCursor : MonoBehaviour {
             this.tile.ResetTile ();
 
         this.tile = tile;
-        tile.GetMoves (player);
+        tile.EnableMoves (player);
         //tile.SetFocus (true, Color.cyan);
     }
 }

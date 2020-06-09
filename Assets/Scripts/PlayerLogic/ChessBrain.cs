@@ -7,7 +7,7 @@ public abstract class ChessBrain {
     protected ChessGameHandler handler;
     protected TeamColor color;
 
-    public void Init (BoardDrawer board, ChessGameHandler handler, TeamColor color) {
+    public ChessBrain (BoardDrawer board, ChessGameHandler handler, TeamColor color) {
         this.handler = handler;
         this.board = board;
         this.color = color;
