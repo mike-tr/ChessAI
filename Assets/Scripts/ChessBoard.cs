@@ -50,7 +50,16 @@ public class ChessBoard {
         }
     }
 
+    private List<PieceMove>[] PlayerMoves = new List<PieceMove>[4];
+    private int GetIndex (TeamColor color, bool validated) {
+        return validated ? 2 + (int) color : (int) color;
+    }
+
     public List<PieceMove> GetAllPlayerMoves (TeamColor color, bool validated) {
+        int index = GetIndex (color, validated);
+        if (PlayerMoves[index] != null) {
+            return PlayerMoves[index];
+        }
         List<PieceMove> moves = new List<PieceMove> ();
         foreach (var piece in pieces[color]) {
             if (!validated) {
@@ -63,6 +72,9 @@ public class ChessBoard {
                 }
             }
         }
+        // a.k.a its possible we might actually try to draw the same moves multiple times per turn,
+        // so why not save them?, hopefully it wont cause memory leak.
+        PlayerMoves[index] = moves;
         return moves;
     }
 

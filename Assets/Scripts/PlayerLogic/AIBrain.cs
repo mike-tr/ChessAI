@@ -9,7 +9,7 @@ public class AIBrain : ChessBrain {
         // A.k.a the human brain is simple just update the cursour to give controll to this player.
         //handler.cursor.player = color;
 
-        var nextBoard = board.board.GetAllPlayerMoves (color, true) [0].ApplyMove ();
-        board.SwitchBoard (nextBoard);
+        var moves = board.board.GetAllPlayerMoves (color, true);
+        MakeAMove (moves[0]);
     }
 }

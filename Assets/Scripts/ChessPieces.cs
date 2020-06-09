@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum TeamColor {
-    black,
-    white,
+    black = 0,
+    white = 1,
 }
 
 public enum PieceType {
@@ -42,26 +42,21 @@ public class ChessPiece {
         // this method returns, all the valid moves for a given piece, 
         // a.k.a every move that wont result in you'r king being eaten.
         List<PieceMove> nonValidatedMoves = GetMoves ();
-        var validated = new List<PieceMove> ();
-        if (type != PieceType.King) {
-            BoardCord kingCord = node.board.kings[color].node.GetCord ();
-            Debug.Log (kingCord.x + " ," + kingCord.y);
-            //List<PieceMove> moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
-            foreach (var move in nonValidatedMoves) {
-                List<PieceMove> moves = move.ApplyMove ().GetAllPlayerMoves (OppositeTeam (), false);
-                if (!PieceMove.CheckOverlap (moves, kingCord)) {
-                    validated.Add (move);
-                }
+        var validMoves = new List<PieceMove> ();
+        foreach (var move in nonValidatedMoves) {
+            if (move.IsValid ()) {
+                validMoves.Add (move);
             }
-        } else {
-            List<PieceMove> moves = null;
-            foreach (var move in nonValidatedMoves) {
-                moves = move.ApplyMove ().GetAllPlayerMoves (OppositeTeam (), false);
-                if (!move.CheckOverlap (moves)) {
-                    validated.Add (move);
-                }
-            }
-            moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
+        }
+        AddKingMoves (validMoves);
+        return validMoves;
+    }
+
+    public void AddKingMoves (List<PieceMove> validMoves) {
+        if (type == PieceType.King) {
+            List<PieceMove> moves = node.board.GetAllPlayerMoves (OppositeTeam (), false);
+            // if the king didnt move a.k.a he is at the start pos, and he isn't attacked.
+            // we can do the rook king thing, so this is the logic to check if its valid move.
             if (!moved && !PieceMove.CheckOverlap (moves, node)) {
                 var board = node.board;
                 var rook = board.nodes[node.x - 3, node.y];
@@ -71,11 +66,10 @@ public class ChessPiece {
                     if (rookEndCord.piece == null && kingEndCord.piece == null) {
                         if (!PieceMove.CheckOverlap (moves, rookEndCord) &&
                             !PieceMove.CheckOverlap (moves, kingEndCord)) {
-                            validated.Add (new ComplexMove (node, kingEndCord, rook, rookEndCord));
+                            validMoves.Add (new ComplexMove (node, kingEndCord, rook, rookEndCord, true));
                         }
                     }
                 }
-
                 rook = board.nodes[node.x + 4, node.y];
                 if (rook.piece != null && !rook.piece.moved && rook.piece.type == PieceType.Rook) {
                     var rookEndCord = board.nodes[node.x + 1, node.y];
@@ -84,13 +78,12 @@ public class ChessPiece {
                     if (rookEndCord.piece == null && kingEndCord.piece == null && lastPos.piece == null) {
                         if (!PieceMove.CheckOverlap (moves, rookEndCord) &&
                             !PieceMove.CheckOverlap (moves, kingEndCord) && !PieceMove.CheckOverlap (moves, lastPos)) {
-                            validated.Add (new ComplexMove (node, kingEndCord, rook, rookEndCord));
+                            validMoves.Add (new ComplexMove (node, kingEndCord, rook, rookEndCord, true));
                         }
                     }
                 }
             }
         }
-        return validated;
     }
 
     public List<PieceMove> GetMoves () {
@@ -161,7 +154,7 @@ public class ChessPiece {
         ChessNode current = node.GetNodeFrom (offset_x, offset_y);
         if (current == null)
             return 0;
-        Debug.Log (current.x + " , " + current.y + " ,,," + offset_x + " , " + offset_y);
+        //Debug.Log (current.x + " , " + current.y + " ,,," + offset_x + " , " + offset_y);
         if (current != node && !IsAlly (current.piece)) {
             list.Add (new PieceMove (node, current));
             return current.piece == null ? 1 : -1;

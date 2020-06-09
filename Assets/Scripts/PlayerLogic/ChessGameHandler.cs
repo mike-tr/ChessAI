@@ -16,8 +16,8 @@ public class ChessGameHandler : MonoBehaviour {
             whitePlayer = new HumanCBrain (board, this, TeamColor.white);
         }
         if (blackPlayer == null) {
-            //blackPlayer = new HumanCBrain (board, this, TeamColor.black);
-            blackPlayer = new AIBrain (board, this, TeamColor.black);
+            blackPlayer = new HumanCBrain (board, this, TeamColor.black);
+            //blackPlayer = new AIBrain (board, this, TeamColor.black);
         }
         player.Add (TeamColor.white, whitePlayer);
         player.Add (TeamColor.black, blackPlayer);
@@ -43,4 +43,5 @@ public class ChessGameHandler : MonoBehaviour {
     public void NextTurn () {
         player[board.CurrentTurn ()].Play ();
     }
+
 }
