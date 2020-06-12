@@ -45,7 +45,7 @@ public class TileHandler : MonoBehaviour {
         ColorTile (Color.red, true);
     }
 
-    public void DrawAllMoves (TeamColor player) {
+    public void DrawAllMoves (PlayerColor player) {
         if (node.piece != null && node.piece.color == player) {
             var color = Color.black;
             switch (node.piece.type) {
@@ -69,6 +69,7 @@ public class TileHandler : MonoBehaviour {
                     break;
             }
             //ColorTile (color * 2f, true);
+            AddTileColor (color);
             List<PieceMove> moves = node.piece.GetValidMoves ();
             foreach (var move in moves) {
                 //cord.GetTileHandler (drawer).SetFocus (true);
@@ -78,9 +79,9 @@ public class TileHandler : MonoBehaviour {
         }
     }
 
-    public void EnableMoves (TeamColor player) {
+    public void EnableMoves (PlayerColor player) {
         if (move != null) {
-            drawer.SwitchBoard (move.ApplyMove ());
+            drawer.SwitchBoard (move.GetNextBoard ());
             //drawer.RefreshBoard ();
             return;
         }
@@ -98,8 +99,8 @@ public class TileHandler : MonoBehaviour {
 
     public void AddTileColor (Color color) {
         focusRenderer.enabled = true;
-        color.a = 0.3f;
-        focusRenderer.color += color;
+        color.a = 0.9f;
+        focusRenderer.color = (color + focusRenderer.color) * 0.5f;
     }
 
     public void ColorTile (Color color, bool state) {

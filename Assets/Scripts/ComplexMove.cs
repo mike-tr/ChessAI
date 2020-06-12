@@ -14,11 +14,11 @@ public class ComplexMove : PieceMove {
         this.validated = true;
     }
 
-    public override ChessBoard ApplyMove () {
+    public override ChessBoard GetNextBoard () {
         if (finalBoard != null) {
             return finalBoard;
         }
-        var board = base.ApplyMove ();
+        var board = base.GetNextBoard ();
         var enode = secondaryEnd.GetNode (board);
         enode.ReplaceWithAnother (secondaryStart.GetNode (board));
         enode.piece.moved = true;

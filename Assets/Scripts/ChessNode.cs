@@ -24,7 +24,7 @@ public class ChessNode {
         return board.nodes[nx, ny];
     }
 
-    public ChessPiece InitializePiece (PieceType type, TeamColor player, ChessBoard board, bool moved = false) {
+    public ChessPiece InitializePiece (PieceType type, PlayerColor player, ChessBoard board, bool moved = false) {
         piece = new ChessPiece (this, type, player, moved);
         board.pieces[player].Add (piece);
         if (type == PieceType.King) {

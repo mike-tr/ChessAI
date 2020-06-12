@@ -2,28 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ChessBrain {
+[System.Serializable]
+public abstract class ChessBrain : ScriptableObject {
+    public new string name = "random";
     protected BoardDrawer drawer;
-    protected ChessBoard board;
     protected ChessGameHandler handler;
-    protected TeamColor color;
-
-    public ChessBrain (BoardDrawer drawer, ChessGameHandler handler, TeamColor color) {
+    public void LinkBrain (BoardDrawer drawer, ChessGameHandler handler) {
         this.handler = handler;
         this.drawer = drawer;
-        this.color = color;
-        board = drawer.board;
-    }
 
-    public abstract void Play ();
-
-    public void MakeAMove (PieceMove move) {
-        if (move.IsPartOf (board)) {
-            drawer.SwitchBoard (move.ApplyMove ());
+        if (name.Contains ("random")) {
+            PickAName ();
         }
     }
 
-    public List<PieceMove> GetValidMoves () {
-        return board.GetAllPlayerMoves (color, true);
+    public virtual void PickAName () {
+        name = "brain" + GetInstanceID ();
+    }
+
+    public abstract void Play (ChessBoard board);
+
+    protected void AcceptMove (PieceMove move) {
+        if (move.IsPartOf (drawer.board)) {
+            drawer.SwitchBoard (move.GetNextBoard ());
+        }
     }
 }

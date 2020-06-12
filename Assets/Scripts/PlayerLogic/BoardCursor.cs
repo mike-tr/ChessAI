@@ -6,7 +6,7 @@ public class BoardCursor : MonoBehaviour {
     public static BoardCursor cursor;
     TileHandler tile;
     Collider2D coll;
-    public TeamColor player = TeamColor.white;
+    public PlayerColor player = PlayerColor.white;
     // Start is called before the first frame update
     void Start () {
         coll = GetComponent<Collider2D> ();

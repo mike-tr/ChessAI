@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TeamColor {
+public enum PlayerColor {
     black = 0,
     white = 1,
 }
@@ -20,11 +20,11 @@ public enum PieceType {
 public class ChessPiece {
     public ChessNode node;
     public PieceType type;
-    public TeamColor color;
+    public PlayerColor color;
 
     public bool moved;
 
-    public ChessPiece (ChessNode node, PieceType type, TeamColor player, bool moved = false) {
+    public ChessPiece (ChessNode node, PieceType type, PlayerColor player, bool moved = false) {
         this.node = node;
         this.type = type;
         this.color = player;
@@ -168,17 +168,18 @@ public class ChessPiece {
         return piece.color == color;
     }
 
-    public TeamColor OppositeTeam () {
+    public PlayerColor OppositeTeam () {
         // return the color of the enemy
-        return TeamColor.white == color ? TeamColor.black : TeamColor.white;
+        return PlayerColor.white == color ? PlayerColor.black : PlayerColor.white;
     }
 
     public List<PieceMove> PawnMove () {
         // pawns have wierd logic, so they deserve a method of their own.
         var list = new List<PieceMove> ();
-        var dir = color == TeamColor.white ? 1 : -1;
+        var dir = color == PlayerColor.white ? 1 : -1;
         var current = node.GetNodeFrom (0, dir);
-        if (current.piece == null) {
+        //Debug.Log (node.x + " , " + node.y + "  : " + type + " " + color);
+        if (current != null && current.piece == null) {
             list.Add (new PieceMove (node, current));
             var start = dir > 0 ? 1 : 6;
             if (node.y == start) {

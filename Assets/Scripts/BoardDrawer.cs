@@ -7,9 +7,9 @@ public class BoardDrawer : MonoBehaviour {
     public delegate void OnBoardChange ();
     public OnBoardChange OnChangeCallBack;
     public string fileName;
-    public Dictionary<TeamColor, Dictionary<PieceType, Sprite>> sprites = new Dictionary<TeamColor, Dictionary<PieceType, Sprite>> ();
-    public TileHandler[, ] tiles = new TileHandler[8, 8];
-    public ChessBoard board;
+    public Dictionary<PlayerColor, Dictionary<PieceType, Sprite>> sprites { get; private set; } = new Dictionary<PlayerColor, Dictionary<PieceType, Sprite>> ();
+    public TileHandler[, ] tiles { get; private set; } = new TileHandler[8, 8];
+    public ChessBoard board { get; private set; }
     public TileHandler handlerPrefab;
 
     public Vector2 boardOffset;
@@ -26,16 +26,16 @@ public class BoardDrawer : MonoBehaviour {
         tileOffset.y = sp.bounds.size.y / 8;
 
         board = new ChessBoard ();
-        sprites.Add (TeamColor.black, new Dictionary<PieceType, Sprite> ());
-        sprites.Add (TeamColor.white, new Dictionary<PieceType, Sprite> ());
+        sprites.Add (PlayerColor.black, new Dictionary<PieceType, Sprite> ());
+        sprites.Add (PlayerColor.white, new Dictionary<PieceType, Sprite> ());
         holder = new GameObject ("holder").transform;
         holder.parent = transform;
         holder.localPosition = boardOffset;
         Sprite[] load = Resources.LoadAll<Sprite> (fileName);
         foreach (var current in load) {
-            TeamColor color = TeamColor.white;
+            PlayerColor color = PlayerColor.white;
             if (current.name.Contains ("B_")) {
-                color = TeamColor.black;
+                color = PlayerColor.black;
             }
             PieceType type = PieceType.Pawn;
             foreach (PieceType t in System.Enum.GetValues (typeof (PieceType))) {
@@ -54,7 +54,7 @@ public class BoardDrawer : MonoBehaviour {
         SwitchBoard (board);
     }
 
-    public TeamColor CurrentTurn () {
+    public PlayerColor CurrentTurn () {
         return board.currentPlayer;
     }
 

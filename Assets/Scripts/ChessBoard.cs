@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ChessBoard {
-    public const TeamColor white = TeamColor.white;
-    public const TeamColor black = TeamColor.black;
-    public Dictionary<TeamColor, List<ChessPiece>> pieces = new Dictionary<TeamColor, List<ChessPiece>> ();
-    public Dictionary<TeamColor, ChessPiece> kings = new Dictionary<TeamColor, ChessPiece> ();
-    public ChessNode[, ] nodes = new ChessNode[8, 8];
-    public TeamColor currentPlayer = TeamColor.white;
+    public const PlayerColor white = PlayerColor.white;
+    public const PlayerColor black = PlayerColor.black;
+    public Dictionary<PlayerColor, List<ChessPiece>> pieces { get; private set; } = new Dictionary<PlayerColor, List<ChessPiece>> ();
+    public Dictionary<PlayerColor, ChessPiece> kings { get; private set; } = new Dictionary<PlayerColor, ChessPiece> ();
+    public ChessNode[, ] nodes { get; private set; } = new ChessNode[8, 8];
+    public PlayerColor currentPlayer { get; private set; } = PlayerColor.white;
+    public PlayerColor enemyColor { get { return currentPlayer == PlayerColor.white ? PlayerColor.black : PlayerColor.white; } }
 
     public ChessBoard () {
         // Create a plain new Board
@@ -31,7 +32,7 @@ public class ChessBoard {
         return new ChessBoard (pieces, currentPlayer);
     }
 
-    public ChessBoard (Dictionary<TeamColor, List<ChessPiece>> copy, TeamColor nextTurn) {
+    public ChessBoard (Dictionary<PlayerColor, List<ChessPiece>> copy, PlayerColor nextTurn) {
         // Generate a copy of a board
         this.currentPlayer = nextTurn;
         this.pieces.Add (white, new List<ChessPiece> ());
@@ -51,15 +52,12 @@ public class ChessBoard {
     }
 
     private List<PieceMove>[] PlayerMoves = new List<PieceMove>[4];
-    private int GetIndex (TeamColor color, bool validated) {
+    private int GetIndex (PlayerColor color, bool validated) {
         return validated ? 2 + (int) color : (int) color;
     }
 
-    public List<PieceMove> GetAllPlayerMoves (TeamColor color, bool validated) {
+    public List<PieceMove> GetAllPlayerMoves (PlayerColor color, bool validated) {
         int index = GetIndex (color, validated);
-        if (PlayerMoves[index] != null) {
-            return PlayerMoves[index];
-        }
         List<PieceMove> moves = new List<PieceMove> ();
         foreach (var piece in pieces[color]) {
             if (!validated) {
@@ -79,17 +77,17 @@ public class ChessBoard {
     }
 
     public void ChangeTurn () {
-        if (currentPlayer == TeamColor.black)
-            currentPlayer = TeamColor.white;
+        if (currentPlayer == PlayerColor.black)
+            currentPlayer = PlayerColor.white;
         else
-            currentPlayer = TeamColor.black;
+            currentPlayer = PlayerColor.black;
     }
 
     public ChessPiece GetPieceAt (int x, int y) {
         return nodes[x, y].piece;
     }
 
-    public void initSide (int y, TeamColor player) {
+    public void initSide (int y, PlayerColor player) {
         nodes[0, y].InitializePiece (PieceType.Rook, player, this);
         nodes[7, y].InitializePiece (PieceType.Rook, player, this);
         nodes[1, y].InitializePiece (PieceType.Knight, player, this);

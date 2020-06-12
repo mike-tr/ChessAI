@@ -2,15 +2,46 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (fileName = "AIBrain", menuName = "Chess brains/basic")]
-public class AiBrain : ChessBrain {
+[CreateAssetMenu (fileName = "SAIBrain", menuName = "Chess brains/basic2")]
+public class SAIBrain : ChessBrain {
+
+    public int recursions = 1;
     public override void Play (ChessBoard board) {
         var color = board.currentPlayer;
         var moves = board.GetAllPlayerMoves (color, true);
-        RateMoves (moves, board, color);
-        moves.Sort ();
-        //Debug.Log (moves[0].score + " , " + moves[1].score);
-        AcceptMove (moves[0]);
+        //RateMoves (moves, board, color);
+        //moves.Sort ();
+        var move = RecursiveRate (moves, board, color, recursions);
+        AcceptMove (move);
+    }
+
+    public PieceMove RecursiveRate (List<PieceMove> moves, ChessBoard initial, PlayerColor color, int recursions) {
+        var enemy = color == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
+        var score = ScorePlayer (initial, enemy);
+
+        PieceMove best = null;
+        float mscore = float.MinValue;
+        foreach (var move in moves) {
+            var nboard = move.GetNextBoard ();
+            move.score += (score - ScorePlayer (nboard, enemy)) * 3;
+            move.score += nboard.GetAllPlayerMoves (color, false).Count;
+
+            var nmoves = nboard.GetAllPlayerMoves (enemy, true);
+            if (nmoves.Count > 0) {
+                if (recursions > 0) {
+                    move.score -= RecursiveRate (nmoves, nboard, enemy, recursions - 1).score;
+                }
+            } else {
+                move.score = float.MaxValue;
+                return move;
+            }
+
+            if (move.score >= mscore) {
+                best = move;
+                mscore = move.score;
+            }
+        }
+        return best;
     }
 
     public void RateMoves (List<PieceMove> moves, ChessBoard initial, PlayerColor color) {

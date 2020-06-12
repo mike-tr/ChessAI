@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ChessGameHandler : MonoBehaviour {
     // Start is called before the first frame update
@@ -8,19 +10,28 @@ public class ChessGameHandler : MonoBehaviour {
     public BoardDrawer board;
     public ChessBrain whitePlayer;
     public ChessBrain blackPlayer;
-    private Dictionary<TeamColor, ChessBrain> player = new Dictionary<TeamColor, ChessBrain> ();
+    private Dictionary<PlayerColor, ChessBrain> player = new Dictionary<PlayerColor, ChessBrain> ();
+    public float w8Time = 50;
+
+    public Text text;
+
     void Start () {
         board = GetComponent<BoardDrawer> ();
         board.OnChangeCallBack += NextTurn;
         if (whitePlayer == null) {
-            whitePlayer = new HumanCBrain (board, this, TeamColor.white);
+            whitePlayer = new HumanCBrain ();
+            //whitePlayer = new AIBrain (board, this, TeamColor.white);
         }
         if (blackPlayer == null) {
-            blackPlayer = new HumanCBrain (board, this, TeamColor.black);
-            //blackPlayer = new AIBrain (board, this, TeamColor.black);
+            blackPlayer = new HumanCBrain ();
+            //blackPlayer = new SAIBrain (board, this, TeamColor.black);
         }
-        player.Add (TeamColor.white, whitePlayer);
-        player.Add (TeamColor.black, blackPlayer);
+        whitePlayer.LinkBrain (board, this);
+        blackPlayer.LinkBrain (board, this);
+        player.Add (PlayerColor.white, whitePlayer);
+        player.Add (PlayerColor.black, blackPlayer);
+
+        NextTurn ();
     }
 
     private void Update () {
@@ -41,7 +52,36 @@ public class ChessGameHandler : MonoBehaviour {
     }
 
     public void NextTurn () {
-        player[board.CurrentTurn ()].Play ();
+        if (board.board.GetAllPlayerMoves (board.CurrentTurn (), true).Count < 1) {
+            Debug.Log ("player lost!");
+            if (text) {
+                text.transform.parent.gameObject.SetActive (true);
+                var other = board.CurrentTurn () == PlayerColor.black ? PlayerColor.white : PlayerColor.black;
+                text.text = player[other].name + "won as " + other;
+            }
+            StartCoroutine (ResetGame (1.5f));
+            return;
+        }
+        if (w8Time > 0) {
+            StartCoroutine (SwitchTurn ());
+        } else {
+            player[board.CurrentTurn ()].Play (board.board);
+        }
+    }
+
+    IEnumerator SwitchTurn () {
+        yield return new WaitForSeconds (w8Time * 0.001f);
+        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch ();
+        sw.Start ();
+        player[board.CurrentTurn ()].Play (board.board);
+        sw.Stop ();
+        Debug.Log ("Player " + board.CurrentTurn () + " has made a move in : " + sw.ElapsedMilliseconds + " ms");
+    }
+
+    IEnumerator ResetGame (float delay) {
+        yield return new WaitForSeconds (delay);
+        SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+        text.transform.parent.gameObject.SetActive (false);
     }
 
 }
