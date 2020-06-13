@@ -34,6 +34,8 @@ public class ChessGameHandler : MonoBehaviour {
         NextTurn ();
     }
 
+    private ChessBoard next = null;
+    private float time;
     private void Update () {
         if (Input.GetKeyDown (KeyCode.I)) {
             Debug.Log ("show every possible move!");
@@ -49,17 +51,31 @@ public class ChessGameHandler : MonoBehaviour {
                 }
             }
         }
+        if (next != null) {
+            Debug.Log ("Player " + board.CurrentTurn () + " has made a move in : " + (Time.timeSinceLevelLoad - time) * 1000 + " ms");
+            board.SwitchBoard (next);
+            next = null;
+        }
+    }
+
+    public void ApplyBoard (ChessBoard board) {
+        next = board;
     }
 
     public void NextTurn () {
+        time = Time.timeSinceLevelLoad;
         if (board.board.GetAllPlayerMoves (board.CurrentTurn (), true).Count < 1) {
-            Debug.Log ("player lost!");
+            string op = "Draw " + board.CurrentTurn () + " has no possible moves.";
+            if (board.board.IsChecked (board.CurrentTurn ())) {
+                var other = board.CurrentTurn () == PlayerColor.black ? PlayerColor.white : PlayerColor.black;
+                op = player[other].name + "won as " + other;
+            }
+            Debug.Log (op);
             if (text) {
                 text.transform.parent.gameObject.SetActive (true);
-                var other = board.CurrentTurn () == PlayerColor.black ? PlayerColor.white : PlayerColor.black;
-                text.text = player[other].name + "won as " + other;
+                text.text = op;
             }
-            StartCoroutine (ResetGame (1.5f));
+            StartCoroutine (ResetGame (3f));
             return;
         }
         if (w8Time > 0) {
@@ -75,7 +91,7 @@ public class ChessGameHandler : MonoBehaviour {
         sw.Start ();
         player[board.CurrentTurn ()].Play (board.board);
         sw.Stop ();
-        Debug.Log ("Player " + board.CurrentTurn () + " has made a move in : " + sw.ElapsedMilliseconds + " ms");
+        //Debug.Log ("Player " + board.CurrentTurn () + " has made a move in : " + sw.ElapsedMilliseconds + " ms");
     }
 
     IEnumerator ResetGame (float delay) {

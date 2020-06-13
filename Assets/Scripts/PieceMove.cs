@@ -11,7 +11,6 @@ public class PieceMove : IComparable<PieceMove> {
     protected bool valid = false;
     protected bool validated = false;
     protected PlayerColor playerColor;
-
     public float score = 0;
     public PieceMove (ChessNode start, ChessNode end) {
         this.board = start.board;
@@ -78,28 +77,7 @@ public class PieceMove : IComparable<PieceMove> {
         // we get the king position
         BoardCord kingCord = board.kings[playerColor].node.GetCord ();
 
-        valid = true;
-        ChessNode node = board.kings[playerColor].node;
-        foreach (PieceType type in System.Enum.GetValues (typeof (PieceType))) {
-            if (type == PieceType.none) {
-                continue;
-            }
-            var piece = new ChessPiece (node, type, playerColor, true);
-            foreach (var move in piece.GetMoves ()) {
-                var current = board.GetPieceAt (move.end.x, move.end.y);
-                if (current != null && current.type == piece.type && current.color == enemyColor) {
-                    valid = false;
-                    return false;
-                }
-            }
-        }
-
-        //now we check if any of the new moves, is going to override the king position.
-        // List<PieceMove> moves = board.GetAllPlayerMoves (enemyColor, false);
-        // if (!PieceMove.CheckOverlap (moves, kingCord)) {
-        //     // in case of our king not dying, by any move, we say its a valid move.
-        //     valid = true;
-        // }
+        valid = !board.IsChecked (playerColor);
         return valid;
     }
 

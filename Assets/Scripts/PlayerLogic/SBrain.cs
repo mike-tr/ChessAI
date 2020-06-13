@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (fileName = "SAIBrain", menuName = "Chess brains/basic2")]
-public class SAIBrain : ChessBrain {
+[CreateAssetMenu (fileName = "SBrain", menuName = "Chess brains/basic3")]
+public class SBrain : ChessBrain {
 
     public int level = 1;
     public override void Logic (ChessBoard board) {
@@ -17,15 +17,17 @@ public class SAIBrain : ChessBrain {
 
     public PieceMove RecursiveRate (List<PieceMove> moves, ChessBoard initial, PlayerColor color, int level) {
         var enemy = color == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
-        var score = ScorePlayer (initial, enemy);
-
         PieceMove best = moves[0];
         float mscore = float.MinValue;
         foreach (var move in moves) {
             var nboard = move.GetNextBoard ();
-            move.score += (score - ScorePlayer (nboard, enemy)) * 3;
-            move.score += nboard.GetAllPlayerMoves (color, false).Count * 0.5f;
-            move.score += nboard.GetAllPlayerMoves (enemy, false).Count * 0.25f;
+            move.score = 0;
+            var bs = ScoreBoard (nboard, color, enemy);
+            move.score += bs * 3 * Mathf.Abs (bs);
+            //move.score -= ScorePlayer (nboard, enemy) * 3;
+
+            move.score += nboard.GetAllPlayerMoves (color, false).Count * 0.33f;
+            move.score -= nboard.GetAllPlayerMoves (enemy, false).Count * 0.25f;
 
             if (nboard.IsChecked (enemy)) {
                 move.score += 0.5f;
@@ -36,8 +38,6 @@ public class SAIBrain : ChessBrain {
                     mscore = move.score;
                     return move;
                 }
-                //Debug.Log (move.score + " : " + move.id + " level : " + level);
-                //Debug.Log();
             }
 
             if (level > 0) {
@@ -56,6 +56,10 @@ public class SAIBrain : ChessBrain {
             }
         }
         return best;
+    }
+
+    public int ScoreBoard (ChessBoard board, PlayerColor color, PlayerColor enemy) {
+        return ScorePlayer (board, color) - ScorePlayer (board, enemy);
     }
 
     public int ScorePlayer (ChessBoard board, PlayerColor color) {

@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1767fb69f3a07454cb9ae129b0fcd729, type: 3}
-  m_Name: SAIBrain
+  m_Script: {fileID: 11500000, guid: e1f52d831d4875a4387dacbdffdd977b, type: 3}
+  m_Name: SBrain
   m_EditorClassIdentifier: 
-  name: brain13912
-  level: 1
+  name: brain-30550
+  level: 2

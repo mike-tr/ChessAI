@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 [System.Serializable]
@@ -7,6 +9,7 @@ public abstract class ChessBrain : ScriptableObject {
     public new string name = "random";
     protected BoardDrawer drawer;
     protected ChessGameHandler handler;
+    protected ChessBoard board;
     public void LinkBrain (BoardDrawer drawer, ChessGameHandler handler) {
         this.handler = handler;
         this.drawer = drawer;
@@ -20,11 +23,17 @@ public abstract class ChessBrain : ScriptableObject {
         name = "brain" + GetInstanceID ();
     }
 
-    public abstract void Play (ChessBoard board);
+    public abstract void Logic (ChessBoard board);
+
+    public void Play (ChessBoard board) {
+        var th = new Thread (() => Logic (board));
+        th.Start ();
+    }
 
     protected void AcceptMove (PieceMove move) {
         if (move.IsPartOf (drawer.board)) {
-            drawer.SwitchBoard (move.GetNextBoard ());
+            //drawer.SwitchBoard (move.GetNextBoard ());
+            handler.ApplyBoard (move.GetNextBoard ());
         }
     }
 }

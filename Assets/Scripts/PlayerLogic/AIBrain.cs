@@ -4,7 +4,7 @@ using UnityEngine;
 
 [CreateAssetMenu (fileName = "AIBrain", menuName = "Chess brains/basic")]
 public class AiBrain : ChessBrain {
-    public override void Play (ChessBoard board) {
+    public override void Logic (ChessBoard board) {
         var color = board.currentPlayer;
         var moves = board.GetAllPlayerMoves (color, true);
         RateMoves (moves, board, color);

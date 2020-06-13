@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1767fb69f3a07454cb9ae129b0fcd729, type: 3}
   m_Name: basic2
   m_EditorClassIdentifier: 
-  name: random
-  recursions: 1
+  name: brain13910
+  level: 1

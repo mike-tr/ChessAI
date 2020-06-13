@@ -76,6 +76,24 @@ public class ChessBoard {
         return moves;
     }
 
+    public bool IsChecked (PlayerColor color) {
+        var enemyColor = color == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
+        ChessNode node = kings[color].node;
+        foreach (PieceType type in System.Enum.GetValues (typeof (PieceType))) {
+            if (type == PieceType.none) {
+                continue;
+            }
+            var piece = new ChessPiece (node, type, color, true);
+            foreach (var move in piece.GetMoves ()) {
+                var current = GetPieceAt (move.end.x, move.end.y);
+                if (current != null && current.type == piece.type && current.color == enemyColor) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void ChangeTurn () {
         if (currentPlayer == PlayerColor.black)
             currentPlayer = PlayerColor.white;
