@@ -69,7 +69,7 @@ public class PieceMove : IComparable<PieceMove> {
         }
         // so if we didnt validate the move, we validate it.
         validated = true;
-        var enemyColor = playerColor == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
+        var enemyColor = (playerColor == PlayerColor.white) ? PlayerColor.black : PlayerColor.white;
 
         // we get the state of the game after the move
         var board = GetNextBoard ();
@@ -82,26 +82,27 @@ public class PieceMove : IComparable<PieceMove> {
     }
 
     public virtual ChessBoard GetNextBoard () {
-        // if (finalBoard != null) {
-        //     return this.finalBoard;
-        // }
-
-        finalBoard = board.Copy ();
-        var enode = end.GetNode (finalBoard);
-        finalBoard.ChangeTurn ();
-
-        enode.ReplaceWithAnother (start.GetNode (finalBoard));
-        var piece = enode.piece;
-        piece.moved = true;
-        if (piece.type == PieceType.Pawn) {
-            if (piece.color == PlayerColor.black) {
-                if (enode.y == 0) {
-                    piece.type = PieceType.Queen;
-                }
-            } else if (enode.y == 7) {
-                piece.type = PieceType.Queen;
-            }
+        if (finalBoard != null) {
+            return this.finalBoard;
         }
+        finalBoard = board.ApplyMove(this);
+
+        // finalBoard = board.Copy ();
+        // var end_node = end.GetNode (finalBoard);
+        // finalBoard.ChangeTurn ();
+        // end_node.ReplaceWithAnother (start.GetNode (finalBoard));
+        // // if its a pawn and it got to the "end" convert it to a queen.
+        // var piece = end_node.piece;
+        // piece.moved = true;
+        // if (piece.type == PieceType.Pawn) {
+        //     if (piece.color == PlayerColor.black) {
+        //         if (end_node.y == 0) {
+        //             piece.type = PieceType.Queen;
+        //         }
+        //     } else if (end_node.y == 7) {
+        //         piece.type = PieceType.Queen;
+        //     }
+        // }
         return finalBoard;
     }
 }

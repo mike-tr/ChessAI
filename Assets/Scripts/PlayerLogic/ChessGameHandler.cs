@@ -36,7 +36,7 @@ public class ChessGameHandler : MonoBehaviour {
 
     private ChessBoard next = null;
     private float time;
-    private void Update () {
+    private async void Update () {
         if (Input.GetKeyDown (KeyCode.I)) {
             Debug.Log ("show every possible move!");
             board.RefreshBoard ();
@@ -52,7 +52,8 @@ public class ChessGameHandler : MonoBehaviour {
             }
         }
         if (next != null) {
-            Debug.Log ("Player " + board.CurrentTurn () + " has made a move in : " + (Time.timeSinceLevelLoad - time) * 1000 + " ms");
+            Debug.Log ("Player " + board.CurrentTurn () + " has made a move in : " 
+                + (Time.timeSinceLevelLoad - time) * 1000 + " ms" + " moveId :" + next.movesMade);
             board.SwitchBoard (next);
             next = null;
         }

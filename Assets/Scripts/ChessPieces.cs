@@ -19,7 +19,7 @@ public enum PieceType {
 
 public class ChessPiece {
     public ChessNode node;
-    public PieceType type;
+    public PieceType type = PieceType.none;
     public PlayerColor color;
 
     public bool moved;
@@ -60,7 +60,7 @@ public class ChessPiece {
             if (!moved && !PieceMove.CheckOverlap (moves, node)) {
                 var board = node.board;
                 var rook = board.nodes[node.x - 3, node.y];
-                if (rook.piece != null && !rook.piece.moved && rook.piece.type == PieceType.Rook) {
+                if (rook.GetPieceType() == PieceType.Rook && !rook.piece.moved) {
                     var rookEndCord = board.nodes[node.x - 1, node.y];
                     var kingEndCord = board.nodes[node.x - 2, node.y];
                     if (rookEndCord.piece == null && kingEndCord.piece == null) {
@@ -71,7 +71,7 @@ public class ChessPiece {
                     }
                 }
                 rook = board.nodes[node.x + 4, node.y];
-                if (rook.piece != null && !rook.piece.moved && rook.piece.type == PieceType.Rook) {
+                if (rook.GetPieceType() == PieceType.Rook && !rook.piece.moved) {
                     var rookEndCord = board.nodes[node.x + 1, node.y];
                     var kingEndCord = board.nodes[node.x + 2, node.y];
                     var lastPos = board.nodes[node.x + 3, node.y];

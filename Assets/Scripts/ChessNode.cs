@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ChessNode {
-    public ChessPiece piece;
-    public ChessBoard board;
-    public int x, y;
-
+    public ChessPiece piece { get ; private set; }
+    public ChessBoard board { get; private set; }
+    public int x { get; private set;}
+    public int y { get; private set;}
     public ChessNode (ChessBoard board, int x, int y) {
         this.board = board;
         this.x = x;
@@ -30,6 +30,14 @@ public class ChessNode {
         if (type == PieceType.King) {
             board.kings.Add (player, piece);
         }
+        return piece;
+    }
+
+    public PieceType GetPieceType(){
+        return piece == null ? PieceType.none : piece.type;
+    }
+
+    public ChessPiece GetPiece(){
         return piece;
     }
 

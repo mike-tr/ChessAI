@@ -48,7 +48,7 @@ public class TileHandler : MonoBehaviour {
     public void DrawAllMoves (PlayerColor player) {
         if (node.piece != null && node.piece.color == player) {
             var color = Color.black;
-            switch (node.piece.type) {
+            switch (node.GetPieceType()) {
                 case PieceType.Knight:
                     color = Color.blue;
                     break;

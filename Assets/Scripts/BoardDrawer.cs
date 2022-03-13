@@ -19,6 +19,8 @@ public class BoardDrawer : MonoBehaviour {
     private Camera cam;
 
     private void Start () {
+        ChessBoardMemory memory = new ChessBoardMemory();
+
         cam = Camera.main;
         var sp = GetComponent<SpriteRenderer> ();
         Debug.Log (sp.bounds.size);
@@ -26,6 +28,9 @@ public class BoardDrawer : MonoBehaviour {
         tileOffset.y = sp.bounds.size.y / 8;
 
         board = new ChessBoard ();
+        //print(memory.BoardHash(board));
+
+
         sprites.Add (PlayerColor.black, new Dictionary<PieceType, Sprite> ());
         sprites.Add (PlayerColor.white, new Dictionary<PieceType, Sprite> ());
         holder = new GameObject ("holder").transform;
@@ -52,6 +57,7 @@ public class BoardDrawer : MonoBehaviour {
             }
         }
         SwitchBoard (board);
+        //print(memory.BoardHash(board));
     }
 
     public PlayerColor CurrentTurn () {
@@ -60,6 +66,7 @@ public class BoardDrawer : MonoBehaviour {
 
     public void SwitchBoard (ChessBoard newBoard) {
         board = newBoard;
+        ChessBoardMemory.instance.free(newBoard.movesMade);
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 tiles[x, y].SetNode (newBoard.nodes[x, y]);
