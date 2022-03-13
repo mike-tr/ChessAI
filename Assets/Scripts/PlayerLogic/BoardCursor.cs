@@ -4,28 +4,28 @@ using UnityEngine;
 
 public class BoardCursor : MonoBehaviour {
     public static BoardCursor cursor;
-    TileHandler tile;
+    SquareHandler tile;
     Collider2D coll;
-    public PlayerColor player = PlayerColor.white;
+    public int player = PlayerColor.white;
     // Start is called before the first frame update
-    void Start () {
-        coll = GetComponent<Collider2D> ();
+    void Start() {
+        coll = GetComponent<Collider2D>();
         cursor = this;
     }
 
-    public void SetPos (Vector2 pos) {
+    public void SetPos(Vector2 pos) {
         coll.enabled = true;
         //tile.SetFocus (false);
         transform.position = pos;
     }
 
-    public void SetTile (TileHandler tile) {
+    public void SetTile(SquareHandler tile) {
         coll.enabled = false;
         if (this.tile)
-            this.tile.ResetTile ();
+            this.tile.ResetTile();
 
         this.tile = tile;
-        tile.EnableMoves (player);
+        tile.EnableMoves(player);
         //tile.SetFocus (true, Color.cyan);
     }
 }
