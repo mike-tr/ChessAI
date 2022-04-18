@@ -35,23 +35,41 @@ namespace Chess {
                     x++;
                 }
             }
+            position.WhiteToMove = sections[1][0] == 'w';
+            if (sections.Length > 1) {
+                position.WhiteCastleKingside = sections[2].Contains('K');
+                position.WhiteCastleQueenside = sections[2].Contains('Q');
+                position.BlackCastleKingside = sections[2].Contains('k');
+                position.BlackCastleQueenside = sections[2].Contains('q');
+            } else {
+                position.BlackCastleKingside = position.WhiteCastleKingside = position.BlackCastleQueenside = position.WhiteCastleQueenside = true;
+            }
+
+            if (sections.Length > 2 && sections[3].Length > 1) {
+                Debug.Log(sections[3]);
+                int ry = sections[3][0] - 'a';
+                int rx = sections[3][1] - '1';
+                position.EnPassant = ry * 8 + rx;
+            } else {
+                position.EnPassant = LoadedPositionInfo.NoEnPessant;
+            }
             return position;
         }
 
-    }
+        public class LoadedPositionInfo {
+            public const int NoEnPessant = -1;
+            public int[] Squares;
+            public bool WhiteToMove;
+            public bool WhiteCastleKingside;
+            public bool WhiteCastleQueenside;
+            public bool BlackCastleKingside;
+            public bool BlackCastleQueenside;
+            public int EnPassant;
+            public int PlyCount;
 
-    public class LoadedPositionInfo {
-        public int[] Squares;
-        public bool WhiteToMove;
-        public bool WhiteCastleKingside;
-        public bool WhiteCastleQueenside;
-        public bool BlackCastleKingside;
-        public bool BlackCastleQueenside;
-        public int EnPassant;
-        public int PlyCount;
-
-        public LoadedPositionInfo() {
-            Squares = new int[64];
+            public LoadedPositionInfo() {
+                Squares = new int[64];
+            }
         }
     }
 }

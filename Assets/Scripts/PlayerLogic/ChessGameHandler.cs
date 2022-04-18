@@ -31,8 +31,8 @@ namespace ChessGraphics {
             }
             whitePlayer.LinkBrain(board, this);
             blackPlayer.LinkBrain(board, this);
-            player.Add(PlayerColor.white, whitePlayer);
-            player.Add(PlayerColor.black, blackPlayer);
+            player.Add(PlayerIndexColor.white, whitePlayer);
+            player.Add(PlayerIndexColor.black, blackPlayer);
 
             NextTurn();
         }
@@ -47,7 +47,7 @@ namespace ChessGraphics {
                     for (int y = 0; y < 8; y++) {
                         var c = new Color(Random.value, Random.value, Random.value, 1);
                         c.a = 1f;
-                        var tile = board.tiles[y * 8 + x];
+                        var tile = board.squareHandlers[y * 8 + x];
                         var xy = x * y / 64f;
 
                         tile.DrawAllMoves(board.CurrentTurn());

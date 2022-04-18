@@ -4,37 +4,47 @@ using UnityEngine;
 
 namespace Chess {
     public class ChessBoard {
-        public const int white = PlayerColor.white;
-        public const int black = PlayerColor.black;
+        public const int EnPassantNO = ChessFenUtility.LoadedPositionInfo.NoEnPessant;
+        public readonly static PlayerIndexColor white = PlayerIndexColor.white;
+        public readonly static PlayerIndexColor black = PlayerIndexColor.black;
 
         public int[] Squares = new int[64];
-        public List<int> Pieces { get; private set; } = new List<int>();
-        public int CurrentPlayer { get; private set; } = PlayerColor.white;
-        public int EnemyColor { get { return CurrentPlayer == PlayerColor.white ? PlayerColor.black : PlayerColor.white; } }
+        public Dictionary<PlayerIndexColor, List<int>> Pieces { get; private set; } = new Dictionary<PlayerIndexColor, List<int>>();
+        public PlayerIndexColor CurrentPlayer { get; private set; } = PlayerIndexColor.white;
+        public PlayerIndexColor EnemyColor { get; private set; } = PlayerIndexColor.black;
         public int MovesMade { get; private set; }
+        public int EnPassant { get; private set; } = EnPassantNO;
 
+        public bool WhiteCastleKingside { get; private set; }
+        public bool WhiteCastleQueenside { get; private set; }
+        public bool BlackCastleKingside { get; private set; }
+        public bool BlackCastleQueenside { get; private set; }
+
+        public PsuedoLegalMoves PLM;
         public ChessBoard() {
             // Create a plain new Board
             this.MovesMade = 0;
 
             var position = ChessFenUtility.LoadFenPosition(ChessFenUtility.startFen);
-            // Square[0] = Piece.Queen | Piece.White;
-            // Square[7] = Piece.Rook | Piece.White;
-            // Square[7 * 8] = Piece.King | Piece.Black;
-            // pieces.Add (white, new List<ChessPiece> ());
-            // pieces.Add (black, new List<ChessPiece> ());
-            // for (int y = 0; y < 8; y++) {
-            //     for (int x = 0; x < 8; x++) {
-            //         nodes[x, y] = new ChessNode(this, x, y);
-            //     }
-            // }
-            //Squares = position.Squares;
+            this.Pieces = new Dictionary<PlayerIndexColor, List<int>>();
+            this.Pieces.Add(PlayerIndexColor.white, new List<int>());
+            this.Pieces.Add(PlayerIndexColor.black, new List<int>());
             for (int i = 0; i < 64; i++) {
-                Squares[i] = position.Squares[i];
-                //nodes[i, 6].InitializePiece(PieceType.Pawn, black, this);
-                //nodes[i, 1].InitializePiece(PieceType.Pawn, white, this);
+                int piece = position.Squares[i];
+                Squares[i] = piece;
+                if (piece != Piece.None) {
+                    PlayerIndexColor index = Piece.GetColor(piece);
+                    this.Pieces[index].Add(piece);
+                }
             }
-
+            PLM = new PsuedoLegalMoves(this);
+            this.CurrentPlayer = position.WhiteToMove ? PlayerIndexColor.white : PlayerIndexColor.black;
+            this.EnemyColor = !this.CurrentPlayer;
+            this.EnPassant = position.EnPassant;
+            this.BlackCastleQueenside = position.BlackCastleQueenside;
+            this.BlackCastleKingside = position.BlackCastleKingside;
+            this.WhiteCastleKingside = position.WhiteCastleKingside;
+            this.WhiteCastleQueenside = position.WhiteCastleQueenside;
             // initSide (7, black);
             // initSide (0, white);
             // hash = ChessBoardMemory.instance.BoardHash(this);
@@ -48,10 +58,27 @@ namespace Chess {
             // Generate a copy of a board
             this.CurrentPlayer = other.CurrentPlayer;
             this.MovesMade = other.MovesMade;
+            this.Pieces = new Dictionary<PlayerIndexColor, List<int>>();
+            //this.Pieces.Add(PlayerIndexColor.white, new List<int>());
+            //this.Pieces.Add(PlayerIndexColor.black, new List<int>());
+            foreach (var key in other.Pieces.Keys) {
+                this.Pieces.Add(key, new List<int>(other.Pieces[key]));
+            }
+
             for (int i = 0; i < 64; i++) {
                 this.Squares[i] = other.Squares[i];
             }
-            this.Pieces = new List<int>(other.Pieces);
+            this.CurrentPlayer = other.CurrentPlayer;
+            this.EnemyColor = other.EnemyColor;
+            this.BlackCastleKingside = other.BlackCastleKingside;
+            this.BlackCastleQueenside = other.BlackCastleQueenside;
+            this.WhiteCastleKingside = other.WhiteCastleKingside;
+            this.WhiteCastleQueenside = other.WhiteCastleQueenside;
+            this.EnPassant = other.EnPassant;
+            this.MovesMade = other.MovesMade;
+
+            PLM = new PsuedoLegalMoves(this);
+            //this.Pieces = new List<int>(other.Pieces);
         }
 
         private List<PieceMove>[] PlayerMoves = new List<PieceMove>[4];
@@ -60,7 +87,12 @@ namespace Chess {
             return color == black ? v : 2 + v;
         }
 
-        public List<PieceMove> GetAllPlayerMoves(int color, bool validated) {
+        public List<PieceMove> GetPieceMoves(int Square) {
+            return PLM.GetMoves(Square);
+        }
+
+
+        public List<PieceMove> GetAllPlayerMoves(PlayerIndexColor color, bool validated) {
             // int index = GetIndex(color, validated);
             // if (PlayerMoves[index] != null) {
             //     return PlayerMoves[index];
@@ -83,7 +115,7 @@ namespace Chess {
             return null;
         }
 
-        public bool IsChecked(int color) {
+        public bool IsChecked(PlayerIndexColor color) {
             // var enemyColor = color == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
             // ChessNode node = kings[color].node;
             // foreach (PieceType type in System.Enum.GetValues (typeof (PieceType))) {
@@ -102,10 +134,8 @@ namespace Chess {
         }
 
         public void ChangeTurn() {
-            // if (currentPlayer == PlayerColor.black)
-            //     currentPlayer = PlayerColor.white;
-            // else
-            //     currentPlayer = PlayerColor.black;
+            CurrentPlayer = EnemyColor;
+            EnemyColor = !EnemyColor;
         }
 
         // public ChessPiece GetPieceAt(int x, int y) {
@@ -124,47 +154,20 @@ namespace Chess {
         }
 
         public ChessBoard ApplyMove(PieceMove move) {
-            // var finalBoard = this.Copy();
-            // var end_node = move.end.GetNode(finalBoard);
-            // // Remove hash of prev piece position
-            // ChessBoardMemory memory = ChessBoardMemory.instance;
-            // BitString encoding = memory.GetEncoding(move.start, this);
-            // finalBoard.hash *= encoding;
-            // // Remove hash of next piece position ( if there was unit on it )
-            // encoding = memory.GetEncoding(end_node);
-            // finalBoard.hash *= encoding;
-
-            // // Apply new turn.
-            // finalBoard.ChangeTurn();
-            // end_node.ReplaceWithAnother(move.start.GetNode(finalBoard));
-
-            // // if its a pawn and it got to the "end" convert it to a queen.
-            // var piece = end_node.piece;
-            // piece.moved = true;
-            // if (piece.type == PieceType.Pawn) {
-            //     if (piece.color == PlayerColor.black) {
-            //         if (end_node.y == 0) {
-            //             piece.type = PieceType.Queen;
-            //         }
-            //     } else if (end_node.y == 7) {
-            //         piece.type = PieceType.Queen;
-            //     }
-            // }
-            // // Add hash of new position.
-            // encoding = memory.GetEncoding(end_node);
-            // finalBoard.hash *= encoding;
-            // finalBoard.movesMade++;
-
-            // // ChessBoard saved = memory.GetBoard(finalBoard.movesMade, finalBoard.hash);
-            // // if(saved == null){
-            // //     saved = finalBoard;
-            // //     memory.push(saved);
-            // // }
-
-            // //Debug.Log(finalBoard.hash);
-            // //Debug.Log(memory.BoardHash(finalBoard));
-            // return finalBoard;
-            return null;
+            // we just need to swap the pieces and put empty piece on the old position.
+            // remove the piece that was eaten, from all references.
+            var finalBoard = this.Copy();
+            var targetSqaurePiece = finalBoard.Squares[move.TargetSquare];
+            if (targetSqaurePiece != Piece.None) {
+                finalBoard.Pieces[Piece.GetColor(targetSqaurePiece)].Remove(targetSqaurePiece);
+            }
+            var pieceToMove = finalBoard.Squares[move.StartSquare];
+            finalBoard.Squares[move.StartSquare] = Piece.None;
+            finalBoard.Squares[move.TargetSquare] = pieceToMove;
+            finalBoard.ChangeTurn();
+            finalBoard.MovesMade++;
+            Debug.Log(finalBoard.MovesMade + " " + this.MovesMade);
+            return finalBoard;
         }
 
         public bool CheckRealMove(PieceMove move) {

@@ -1,38 +1,32 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Chess {
-    public static class PlayerColor {
-        public const int black = Piece.Black;
-        public const int white = Piece.White;
-    }
-
     public static class Piece {
         public const int None = 0;
-        public const int King = 1;
-        public const int Pawn = 2;
-        public const int Knight = 3;
-        public const int Bishop = 5;
-        public const int Rook = 6;
-        public const int Queen = 7;
-        public const int White = 8;
-        public const int Black = 16;
+        public const int King = 1 << 1;
+        public const int Pawn = 2 << 1;
+        public const int Knight = 3 << 1;
+        public const int Bishop = 5 << 1;
+        public const int Rook = 6 << 1;
+        public const int Queen = 7 << 1;
+        public const int White = 1; // after mask
+        public const int Black = 0; // after mask
 
-        const int typeMask = 0b00111;
-        const int blackMask = 0b10000;
-        const int whiteMask = 0b01000;
-        const int colourMask = whiteMask | blackMask;
+        const int typeMask = 0b001110;
+        const int whiteMask = 0b00001;
+        const int colorMask = whiteMask;
 
-        public static bool IsColour(int piece, int colour) {
-            return (piece & colourMask) == colour;
+        public static bool IsColour(int piece, PlayerIndexColor colour) {
+            return (piece & colorMask) == colour.index;
         }
 
-        public static int Colour(int piece) {
-            return piece & colourMask;
+        public static PlayerIndexColor GetColor(int piece) {
+            return (piece & whiteMask) == White ? PlayerIndexColor.white : PlayerIndexColor.black;
         }
 
-        public static int PieceType(int piece) {
+        public static int GetPieceType(int piece) {
             return piece & typeMask;
         }
 

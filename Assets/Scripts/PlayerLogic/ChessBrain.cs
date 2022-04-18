@@ -34,10 +34,9 @@ namespace ChessAI {
         }
 
         protected void AcceptMove(PieceMove move) {
-
-
             if (drawer.board.CheckRealMove(move)) {
                 //drawer.SwitchBoard (move.GetNextBoard ());
+                //handler.ApplyBoard(drawer.board.ApplyMove(move));
                 handler.ApplyBoard(drawer.board.ApplyMove(move));
             }
         }

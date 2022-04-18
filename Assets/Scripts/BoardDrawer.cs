@@ -8,7 +8,7 @@ namespace ChessGraphics {
         public delegate void OnBoardChange();
         public OnBoardChange OnChangeCallBack;
         public string fileName;
-        public SquareHandler[] tiles { get; private set; } = new SquareHandler[64];
+        public SquareHandler[] squareHandlers { get; private set; } = new SquareHandler[64];
         public ChessBoard board { get; private set; }
         public SquareHandler handlerPrefab;
 
@@ -39,8 +39,8 @@ namespace ChessGraphics {
 
             for (int x = 0; x < 8; x++) {
                 for (int y = 0; y < 8; y++) {
-                    tiles[y * 8 + x] = Instantiate(handlerPrefab);
-                    tiles[y * 8 + x].Initialize(this, holder, x, y, tileOffset);
+                    squareHandlers[y * 8 + x] = Instantiate(handlerPrefab);
+                    squareHandlers[y * 8 + x].Initialize(this, holder, x, y, tileOffset);
                 }
             }
             SwitchBoard(board);
@@ -55,7 +55,7 @@ namespace ChessGraphics {
             board = newBoard;
             ChessBoardMemory.instance.free(newBoard.MovesMade);
             for (int i = 0; i < 64; i++) {
-                tiles[i].UpdateBoard();
+                squareHandlers[i].UpdateBoard();
             }
             // for (int x = 0; x < 8; x++) {
             //     for (int y = 0; y < 8; y++) {
@@ -77,7 +77,7 @@ namespace ChessGraphics {
 
         public void RefreshBoard() {
             for (int i = 0; i < 64; i++) {
-                tiles[i].ResetTile();
+                squareHandlers[i].ResetTile();
             }
         }
     }

@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace Chess {
     public class PieceMove : IComparable<PieceMove> {
-        readonly int StartSquare;
-        readonly int TargetSquare;
-        readonly int PromotionType;
+        public readonly int StartSquare;
+        public readonly int TargetSquare;
+        public readonly int PromotionType;
         public float Score = 0;
         public PieceMove(int startSquare, int targetSqaure) {
             this.StartSquare = startSquare;

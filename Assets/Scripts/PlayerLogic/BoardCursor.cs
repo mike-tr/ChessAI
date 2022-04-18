@@ -8,7 +8,7 @@ namespace ChessGraphics {
         public static BoardCursor cursor;
         SquareHandler tile;
         Collider2D coll;
-        public int player = PlayerColor.white;
+        public PlayerIndexColor player = PlayerIndexColor.white;
         // Start is called before the first frame update
         void Start() {
             coll = GetComponent<Collider2D>();

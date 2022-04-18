@@ -15,14 +15,15 @@ namespace ChessAI {
             AcceptMove(moves[0]);
         }
 
-        public void RateMoves(List<PieceMove> moves, ChessBoard initial, int color) {
-            var enemy = color == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
-            var score = ScorePlayer(initial, enemy);
+        public void RateMoves(List<PieceMove> moves, ChessBoard initial, PlayerIndexColor color) {
+            var enemyColor = !color;
+            var score = ScorePlayer(initial, enemyColor);
             foreach (var move in moves) {
                 var nboard = board.ApplyMove(move);
-                move.Score += (score - ScorePlayer(nboard, enemy)) * 3;
+                //var nboard = board.ApplyMove(move);
+                move.Score += (score - ScorePlayer(nboard, enemyColor)) * 3;
                 move.Score += nboard.GetAllPlayerMoves(color, false).Count;
-                move.Score += nboard.GetAllPlayerMoves(enemy, true).Count > 0 ? 0 : float.MaxValue;
+                move.Score += nboard.GetAllPlayerMoves(enemyColor, true).Count > 0 ? 0 : float.MaxValue;
             }
         }
 

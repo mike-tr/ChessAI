@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,14 +18,17 @@ namespace ChessAI {
             AcceptMove(move);
         }
 
-        public PieceMove RecursiveRate(List<PieceMove> moves, ChessBoard initial, int color, int level) {
-            var enemy = color == PlayerColor.white ? PlayerColor.black : PlayerColor.white;
+        public PieceMove RecursiveRate(List<PieceMove> moves, ChessBoard initial, PlayerIndexColor color, int level) {
+            //var enemy = color == PlayerPieceColor.white ? PlayerPieceColor.black : PlayerPieceColor.white;
+            var enemy = !color;
             var score = ScorePlayer(initial, enemy);
+
 
             PieceMove best = moves[0];
             float mscore = float.MinValue;
             foreach (var move in moves) {
                 //var nboard = move.GetNextBoard();
+                //var nboard = board.ApplyMove(move);
                 var nboard = board.ApplyMove(move);
                 move.Score += (score - ScorePlayer(nboard, enemy)) * 3;
                 move.Score += nboard.GetAllPlayerMoves(color, false).Count * 0.5f;

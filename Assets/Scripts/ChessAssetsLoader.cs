@@ -12,9 +12,9 @@ namespace ChessGraphics {
             PieceSprite = new Dictionary<int, Sprite>();
             Sprite[] load = Resources.LoadAll<Sprite>(fileName);
             foreach (var sprite in load) {
-                int id = PlayerColor.white;
+                int id = Piece.White;
                 if (sprite.name.Contains("B_")) {
-                    id = PlayerColor.black;
+                    id = Piece.Black;
                 }
                 if (sprite.name.Contains("Pawn")) {
                     id = id | Piece.Pawn;

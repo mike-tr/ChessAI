@@ -32,7 +32,7 @@ namespace ChessGraphics {
             focusRenderer.enabled = false;
             int piece = drawer.board.Squares[SquareId];
             //Debug.Log(piece + " " + SquareId);
-            if (Piece.PieceType(piece) == Piece.None) {
+            if (Piece.GetPieceType(piece) == Piece.None) {
                 pieceRenderer.enabled = false;
             } else {
                 pieceRenderer.enabled = true;
@@ -84,22 +84,29 @@ namespace ChessGraphics {
             // }
         }
 
-        public void EnableMoves(int player) {
+        public void EnableMoves(PlayerIndexColor player) {
+            if (move != null) {
+                drawer.SwitchBoard(drawer.board.ApplyMove(move));
+                drawer.RefreshBoard();
+                return;
+            }
+            drawer.RefreshBoard();
+            //Debug.Log("Highligthed cell " + ChessBoardReoresentation.IndexToRepresentation(SquareId));
             ColorTile(Color.cyan, true);
-            // if (move != null) {
-            //     drawer.SwitchBoard (move.GetNextBoard ());
-            //     //drawer.RefreshBoard ();
-            //     return;
-            // }
-            // drawer.RefreshBoard ();
-            // if (player == drawer.CurrentTurn () && node.piece != null && node.piece.color == player) {
-            //     List<PieceMove> moves = node.piece.GetValidMoves ();
-            //     //List<PieceMove> moves = node.piece.GetMoves ();
-            //     foreach (var move in moves) {
-            //         //cord.GetTileHandler (drawer).SetFocus (true);
-            //         move.end.GetTileHandler (drawer).EnableMove (move);
-            //     }
-            // }
+            if (player == drawer.CurrentTurn()) {
+                int piece = drawer.board.Squares[SquareId];
+                if (Piece.GetPieceType(piece) != Piece.None && Piece.IsColour(piece, player)) {
+
+                    List<PieceMove> moves = drawer.board.GetPieceMoves(SquareId);
+                    //List<PieceMove> moves = node.piece.GetMoves ();
+                    foreach (var move in moves) {
+                        //cord.GetTileHandler (drawer).SetFocus (true);
+                        drawer.squareHandlers[move.TargetSquare].EnableMove(move);
+
+                        //move.end.GetTileHandler(drawer).EnableMove(move);
+                    }
+                }
+            }
         }
 
         public void AddTileColor(Color color) {
